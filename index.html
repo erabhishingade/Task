@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+        }
+        .container {
+            background:white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        .preview {
+            display: none;
+            border: 2px solid blue;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .preview img {
+            max-width: 100px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button {
+            background: blue;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <label>Name:</label>
+        <input type="text" id="name" required><br><br>
+        
+        <label>Photo:</label>
+        <input type="file" id="photo" accept="image/*"><br><br>
+
+        <label>Rank:</label>
+        <select id="rank">
+            <option value="First Rank">First Rank</option>
+            <option value="Second Rank">Second Rank</option>
+            <option value="Third Rank">Third Rank</option>
+        </select><br><br>
+
+        <label>ID Number:</label>
+        <input type="text" id="idNumber" readonly><br><br>
+
+        <button onclick="generatePreview()">Generate Preview</button>
+        <button onclick="downloadPDF()">Download PDF</button>
+
+        <div id="preview" class="preview">
+            <h3 id="prevName"></h3>
+            <p id="prevRank"></p>
+            <p id="prevId"></p>
+            <img id="prevPhoto" src="" alt="Uploaded Image">
+        </div>
+    </div>
+
+<script>
+    function generateID() {
+        document.getElementById("idNumber").value = "#" + Math.floor(100000 + Math.random() * 900000);
+    }
+
+    function generatePreview() {
+        let name = document.getElementById("name").value;
+        let rank = document.getElementById("rank").value;
+        let idNumber = document.getElementById("idNumber").value;
+        let photo = document.getElementById("photo").files[0];
+
+        if (!name || !photo) {
+            alert("Please fill in all fields and upload a photo.");
+            return;
+        }
+
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById("prevPhoto").src = e.target.result;
+        };
+        reader.readAsDataURL(photo);
+
+        document.getElementById("prevName").innerText = "Name: " + name;
+        document.getElementById("prevRank").innerText = "Rank: " + rank;
+        document.getElementById("prevId").innerText = "ID: " + idNumber;
+
+        document.getElementById("preview").style.display = "block";
+    }
+
+    function downloadPDF() {
+        let preview = document.getElementById("preview");
+
+        html2canvas(preview).then(canvas => {
+            let imgData = canvas.toDataURL("image/png");
+            let pdf = new jsPDF();
+            pdf.addImage(imgData, 'PNG', 10, 10, 180, 80);
+            pdf.save("certificate.pdf");
+        });
+    }
+
+    window.onload = generateID;
+</script>
+
+</body>
+</html>
+
